@@ -1,4 +1,4 @@
-const {  GraphQLString, GraphQLNonNull, GraphQLID } = require('graphql')
+const {  GraphQLString, GraphQLNonNull, GraphQLID, GraphQLFloat, GraphQLInt } = require('graphql')
 const {UserType, ProductType} = require('./type')
 const User = require('../model/user')
 const Product = require('../model/product')
@@ -8,13 +8,17 @@ const addProduct = {
     type: ProductType,
     description: 'Add a product',
     args: {
-        name: { type: GraphQLNonNull(GraphQLString) },
-        sellerId: { type: GraphQLNonNull(GraphQLID) }
+        product_name: { type: GraphQLNonNull(GraphQLString) },
+        sellerId: { type: GraphQLNonNull(GraphQLID) },
+        product_price: { type: GraphQLNonNull(GraphQLFloat) },
+        product_available: { type: GraphQLNonNull(GraphQLInt) },
     },
     resolve: (parent, args) => {
         let product = new Product({
-            name: args.name,
-            sellerId: args.sellerId
+            product_name: args.product_name,
+            sellerId: args.sellerId,
+            product_price: args.product_price,
+            product_available: args.product_available,
         })
         return product.save()
     }
@@ -30,15 +34,16 @@ const addUser = {
         mobile: { type: GraphQLNonNull(GraphQLString) },
         password: { type: GraphQLNonNull(GraphQLString) }
     },
-     resolve(parent, args){
-        const user = new User({
+     resolve(parent, args, {req, res}){
+        new User({
             name: args.name,
             address: args.address,
             email: args.email,
             mobile: args.mobile,
             password: args.password,
-        })
-        return user.save()
+        }).save()
+        // user.save()
+        return res.status(200).json({message: 'Sucessfull register!'})
     }
 }
 

@@ -14,6 +14,14 @@ const product = {
     }
 }
 
+const products = {
+    type: new GraphQLList(ProductType),
+    description: 'List of all products',
+    resolve(parent, args) {
+        return Product.find({})
+    }
+}
+
 const user = {
     type: UserType,
     description: 'A Single User',
@@ -25,14 +33,6 @@ const user = {
     }
 }
 
-const products = {
-    type: new GraphQLList(ProductType),
-    description: 'List of all products',
-    resolve(parent, args) {
-        return Product.find({})
-    }
-}
-
 const users = {
     type: new GraphQLList(UserType),
     description: 'List of all users',
@@ -41,4 +41,4 @@ const users = {
     }
 }
 
-module.exports = {product, user, products, users}
+module.exports = {product, products, user, users}

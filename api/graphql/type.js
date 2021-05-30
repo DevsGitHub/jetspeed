@@ -1,4 +1,4 @@
-const { GraphQLObjectType, GraphQLString, GraphQLList, GraphQLNonNull, GraphQLID, GraphQLBoolean } = require('graphql')
+const { GraphQLObjectType, GraphQLString, GraphQLList, GraphQLNonNull, GraphQLID, GraphQLBoolean, GraphQLFloat, GraphQLInt } = require('graphql')
 const Product = require('../model/product')
 const User = require('../model/user')
 
@@ -7,20 +7,23 @@ const ProductType = new GraphQLObjectType({
     description: 'This represents a product by a user',
     fields: () => ({
         id: { type: GraphQLNonNull(GraphQLID) },
-        name: { type: GraphQLNonNull(GraphQLString) },
+        product_name: { type: GraphQLNonNull(GraphQLString) },
         sellerId: { type: GraphQLNonNull(GraphQLString) },
-        user: {
+        product_price: { type: GraphQLNonNull(GraphQLFloat) },
+        product_available: { type: GraphQLNonNull(GraphQLInt) },
+        created: { type: GraphQLNonNull(GraphQLString) },
+        seller: {
             type: UserType,
             resolve(parent, args) {
                 return User.findById(parent.sellerId)
             }
-        }
+        },
     })
 })
 
 const UserType = new GraphQLObjectType({
     name: 'User',
-    description: 'This represents a user of a product',
+    description: 'This represents a users',
     fields: () => ({
         id: { type: GraphQLNonNull(GraphQLID) },
         name: { type: GraphQLNonNull(GraphQLString) },

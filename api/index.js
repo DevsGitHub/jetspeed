@@ -2,9 +2,9 @@ const express = require('express')
 const { graphqlHTTP } = require('express-graphql')
 const app = express()
 const mongoose = require('mongoose');
-const schema = require('./schema/schema')
-const {createJwtToken} = require('./jwt/auth')
-const {authenticate} = require('./middleware/tokenchecker')
+const schema = require('./graphql/schema')
+// const {createJwtToken} = require('./jwt/auth')
+// const {authenticate} = require('./middleware/tokenchecker')
 
 require('dotenv').config()
 
@@ -13,7 +13,7 @@ mongoose.connection.on('error', () => console.error(error))
 mongoose.connection.once('open', () => console.log('Connected to Database'))
 
 app.use(express.json())
-app.use(authenticate)
+// app.use(authenticate)
 
 // const sellersRoute = require('./routes/sellers')
 // app.use('/sellers', sellersRoute)

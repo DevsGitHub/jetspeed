@@ -8,6 +8,11 @@ import { NavigationContainer } from '@react-navigation/native';
 import AuthRoute from './route/AuthRoute';
 require('dotenv').config()
 
+const client = new ApolloClient({
+  uri: 'localhost:5000/graphql',
+  cache: new InMemoryCache()
+});
+
 export default function App() {
   const [isLoading, setIsLoading] = React.useState(true);
 
@@ -30,9 +35,11 @@ export default function App() {
     )
   } else {
     return (
-      <NavigationContainer>
-        <AuthRoute />
-      </NavigationContainer>
+      <ApolloProvider client={client}>
+        <NavigationContainer>
+          <AuthRoute />
+        </NavigationContainer>
+      </ApolloProvider>
     )
   }
 }
