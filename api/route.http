@@ -1,0 +1,11 @@
+POST http://localhost:5000/sellers
+Context-Type : application/json
+
+{
+    "name": "Dennis Guitan",
+    "address": "2nd floor, 1st Door",
+    "email": "ytdevsgaming@gmail.com",
+    "mobile": "09456756735"
+}
+
+###
