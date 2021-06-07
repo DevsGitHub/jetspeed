@@ -9,7 +9,7 @@ import AuthRoute from './route/AuthRoute';
 require('dotenv').config()
 
 const client = new ApolloClient({
-  uri: 'localhost:5000/graphql',
+  uri: `${process.env.BASE_URL}graphql`,
   cache: new InMemoryCache()
 });
 
