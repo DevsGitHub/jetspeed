@@ -6,10 +6,11 @@ import { NavigationContainer } from '@react-navigation/native';
 // import { LinearGradient } from 'expo-linear-gradient';
 // import Login from './auth/SignIn';
 import AuthRoute from './route/AuthRoute';
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 require('dotenv').config()
 
 const client = new ApolloClient({
-  uri: 'localhost:5000/graphql',
+  uri: `${process.env.BASE_URL}graphql`,
   cache: new InMemoryCache()
 });
 

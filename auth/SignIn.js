@@ -1,91 +1,107 @@
-import * as React from 'react';
-import { View, Text, StyleSheet, Platform, TouchableOpacity, TextInput, StatusBar } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, TextInput } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { color } from 'react-native-reanimated';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {Feather} from '@expo/vector-icons'
-
+import * as yup from 'yup'
+import { Formik } from 'formik'
+import { styles } from '../styles/signInStyles';
 
 const SignIn = ({navigation}) => {
-    const [data, setData] = React.useState({
-        username: '',
-        password: '',
-        checkUsernameChange: false,
-        secureTextEntry: true,
-        isValidUser: true,
-        isValidPass: true,
-    });
+    const [secureTextEntry, setSecureTextEntry] = useState(true)
+    const loginValidationSchema = yup.object().shape({
+        email: yup.string().email("Please enter valid email").required('Email Address is required'),
+        password: yup.string().min(8, ({ min }) => `Password must be at least ${min} characters`).required('Password is required'),
+    })
 
     return (
-        <SafeAreaProvider style={{paddingHorizontal : 20, flex: 1, backgroundColor: '#000'}}>
+        <SafeAreaProvider style={styles.container}>
             <ScrollView showVerticalScrollIndicator={false}>
-                <View style={{flexDirection: "row", marginTop: 40}}>
-                    <Text style={{fontWeight: "bold", fontSize: 22, color: '#fff'}}>JET</Text>
-                    <Text style={{fontWeight: "bold", fontSize: 22, color: '#333'}}>SPEED</Text>
+                <View style={styles.jetSpeedWordContainter}>
+                    <Text style={styles.jetWord}>JET</Text>
+                    <Text style={styles.speedWord}>SPEED</Text>
                 </View>
-                <View style={{marginTop: 70}}>
-                    <Text style={{fontSize: 27, fontWeight: 'bold', color: '#fff'}}>Welcome Back,</Text>
-                    <Text style={{fontSize: 16, fontWeight: 'bold', color: '#333'}}>Sign in to continue</Text>
+                <View style={styles.welcomeWordContainer}>
+                    <Text style={styles.welcome}>Welcome Back,</Text>
+                    <Text style={styles.signContinue}>Sign in to continue</Text>
                 </View>
-                <View style={{marginTop: 20}}>
-                    <View style={{flexDirection: 'row', marginTop: 20, borderBottomWidth: 1, borderBottomColor: '#f2f2f2', paddingBottom: 5}}>
-                        <Feather
-                            name="mail"
-                            color={'#fff'}
-                            size={20}
-                            style={{position: 'absolute'}}
-                        />
-                        <TextInput
-                            placeholder="Email"
-                            style={{
-                                color: '#fff', 
-                                paddingLeft: 30, 
-                                flex: 1, 
-                                fontSize: 18
-                            }}
-                            autoCapitalize="none"
-                        />
-                    </View>
-                    <View style={{flexDirection: 'row', marginTop: 20, borderBottomWidth: 1, borderBottomColor: '#f2f2f2', paddingBottom: 5}}>
-                        <Feather
-                            name="lock"
-                            color={'#fff'}
-                            size={20}
-                            style={{position: 'absolute'}}
-                        />
-                        <TextInput
-                            placeholder="Password"
-                            style={{
-                                color: '#fff', 
-                                paddingLeft: 30, 
-                                flex: 1, 
-                                fontSize: 18
-                            }}
-                            secureTextEntry={data.secureTextEntry}
-                            autoCapitalize="none"
-                        />
-                        <TouchableOpacity onPress={() => setData({...data, secureTextEntry: !data.secureTextEntry})}>
-                            <Feather
-                                name={data.secureTextEntry === true ? "eye" : "eye-off"}
-                                size={20}
-                                color={'#fff'}
-                            />
-                        </TouchableOpacity>
-                    </View>
-                    <TouchableOpacity>
-                        <Text style={{ color: '#17a2b8', marginTop: 20 }}>Forgot password?</Text>
-                    </TouchableOpacity>
-                    <View style={{backgroundColor: '#fff', height: 50, marginTop: 50, justifyContent: 'center', alignItems: 'center', borderRadius: 5}}>
-                        <Text style={{fontSize: 18, color: '#000', fontWeight: 'bold'}}>
-                            SIGN IN
-                        </Text>
-                    </View>
-                    <View style={{flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'center', marginTop: 40, marginBottom: 20}}>
-                        <Text style={{color: '#fff', fontWeight: 'bold'}}>
+                <View style={styles.formContainer}>
+                    <Formik
+                        validationSchema={loginValidationSchema}
+                        initialValues={{ email: '', password: '' }}
+                        onSubmit={values => console.log(values)}
+                    >
+                        {({ 
+                            handleChange, 
+                            handleBlur, 
+                            handleSubmit, 
+                            values,
+                            errors,
+                            isValid,
+                         }) => (
+                        <>
+                            <View style={styles.fieldContainer}>
+                                <Feather
+                                    name="mail"
+                                    size={20}
+                                    style={styles.icon}
+                                />
+                                <TextInput
+                                    name="email"
+                                    placeholder="Email Address"
+                                    style={styles.field}
+                                    onChangeText={handleChange('email')}
+                                    onBlur={handleBlur('email')}
+                                    value={values.email}
+                                    keyboardType="email-address"
+                                />
+                            </View>
+                            {errors.email && <Text style={styles.errorField}>{errors.email}</Text>}
+
+                            <View style={styles.fieldContainer}>
+                                <Feather
+                                    name="lock"
+                                    size={20}
+                                    style={styles.icon}
+                                />
+                                <TextInput
+                                    name="password"
+                                    placeholder="Password"
+                                    style={styles.field}
+                                    onChangeText={handleChange('password')}
+                                    onBlur={handleBlur('password')}
+                                    value={values.password}
+                                    secureTextEntry={secureTextEntry}
+                                    autoCapitalize="none"
+                                />
+                                <TouchableOpacity onPress={() => setSecureTextEntry(!secureTextEntry)}>
+                                    <Feather
+                                        name={secureTextEntry === true ? "eye" : "eye-off"}
+                                        size={20}
+                                        color={'#fff'}
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                            {errors.password && <Text style={styles.errorField}>{errors.password}</Text>}
+
+                            <TouchableOpacity>
+                                <Text style={styles.forgotPass}>Forgot password?</Text>
+                            </TouchableOpacity>
+
+                            <View style={styles.signInContainer}>
+                                <TouchableOpacity onPress={handleSubmit} disabled={!isValid}>
+                                    <Text style={styles.signInButton}> SIGN IN </Text>
+                                </TouchableOpacity>
+                            </View>
+                        </>
+                        )}
+                    </Formik>
+                    <View style={styles.signUpContainer}>
+                        <Text style={styles.dontHaveAcc}>
                             Don't have an account?
                         </Text>
                         <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-                            <Text style={{color: 'red', fontWeight: 'bold'}}> Sign up </Text>
+                            <Text style={styles.signUp}> Sign up </Text>
                         </TouchableOpacity>
                     </View>
                 </View>
