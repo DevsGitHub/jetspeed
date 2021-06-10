@@ -7,9 +7,36 @@ import {Feather, Entypo, Ionicons} from '@expo/vector-icons'
 import * as yup from 'yup'
 import { Formik } from 'formik'
 import { styles } from '../styles/signInStyles';
+import {ADD_USER_MUTATION} from '../graphql/GraphQLMutation'
+import { useMutation } from '@apollo/client'
 
 const SignUp = ({navigation}) => {
     const [secureTextEntry, setSecureTextEntry] = useState(true)
+    const [addUser, {error}] = useMutation(ADD_USER_MUTATION)
+    // const [info, setInfo] = useState({name : '', address: '', email: '', mobile: '', password: ''})
+    const [submitLoad, setSubmitLoad] = useState(false)
+
+    // const handleSubmit = async(values) => {
+    //     setInfo({
+    //         name: values.name,
+    //         address: values.address,
+    //         email: values.email,
+    //         mobile: values.mobile,
+    //         password: values.password
+    //     })
+    //     try {
+    //         setSubmitLoad(true);
+    //         await addSpecUser()
+    //         .then(({data})=>{
+    //             console.log('data: ', data)
+    //         })
+    //         .catch((error)=>{
+    //             console.log('error: ', error)
+    //         })
+    //     } catch (error) {
+    //         console.log(error)
+    //     }
+    // }
 
     const loginValidationSchema = yup.object().shape({
         name: yup.string().required('Name is required'),
@@ -35,7 +62,23 @@ const SignUp = ({navigation}) => {
                     <Formik
                         validationSchema={loginValidationSchema}
                         initialValues={{ name: '', address: '', email: '', mobile: '', password: '', confirm_pass: '' }}
-                        onSubmit={values => console.log(values)}
+                        onSubmit={ async (data, {setErrors}) => {
+                            try {
+                                setSubmitLoad(true);
+                                const response = await addUser({
+                                    variables: {
+                                        data
+                                    }
+                                })
+                                if(error){
+                                    console.log('unsa ni', error)
+                                }
+                                console.log('response', response)
+                            } catch (error) {
+                                console.log('err', error)
+                            }
+                        }}
+                        // onSubmit={handleSubmit}
                     >
                         {({ 
                             handleChange, 
@@ -149,7 +192,7 @@ const SignUp = ({navigation}) => {
                                     />
                                     <TextInput
                                         name="confirm_pass"
-                                        placeholder="Password"
+                                        placeholder="Confirm Password"
                                         style={styles.field}
                                         onChangeText={handleChange('confirm_pass')}
                                         onBlur={handleBlur('confirm_pass')}
@@ -168,7 +211,7 @@ const SignUp = ({navigation}) => {
                                 {errors.confirm_pass && <Text style={styles.errorField}>{errors.confirm_pass}</Text>}
                                 
                                 <View style={styles.signInContainer}>
-                                    <TouchableOpacity onPress={handleSubmit} disabled={!isValid}>
+                                    <TouchableOpacity onPress={handleSubmit} disabled={!isValid || submitLoad}>
                                         <Text style={styles.signInButton}> SIGN UP </Text>
                                     </TouchableOpacity>
                                 </View>

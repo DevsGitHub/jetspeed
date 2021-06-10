@@ -6,12 +6,26 @@ import { NavigationContainer } from '@react-navigation/native';
 // import { LinearGradient } from 'expo-linear-gradient';
 // import Login from './auth/SignIn';
 import AuthRoute from './route/AuthRoute';
-import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
+import { ApolloClient, InMemoryCache, ApolloProvider, from, HttpLink } from '@apollo/client';
+import {onError} from '@apollo/client/link/error';
 require('dotenv').config()
 
+const errorLink = onError(({graphqlError, networkError})=>{
+  if(graphqlError){
+      graphqlError.map(({message, location, path})=>{
+        alert(`Graphql error ${message}`)
+      })
+  }
+})
+
+const link = from([
+  errorLink,
+  new HttpLink({uri: "http://localhost:5000/graphql"}),
+])
+
 const client = new ApolloClient({
-  uri: `${process.env.BASE_URL}graphql`,
-  cache: new InMemoryCache()
+  cache: new InMemoryCache(),
+  link: link
 });
 
 export default function App() {
