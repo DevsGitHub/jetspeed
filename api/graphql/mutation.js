@@ -2,7 +2,7 @@ const {  GraphQLString, GraphQLNonNull, GraphQLID, GraphQLFloat, GraphQLInt } = 
 const {UserType, ProductType} = require('./type')
 const User = require('../model/user')
 const Product = require('../model/product')
-const {createJwtToken} = require('../jwt/auth')
+const bcrypt = require("bcrypt")
 
 const addProduct = {
     type: ProductType,
@@ -34,34 +34,22 @@ const addUser = {
         mobile: { type: GraphQLNonNull(GraphQLString) },
         password: { type: GraphQLNonNull(GraphQLString) }
     },
-     resolve(parent, args, {req, res}){
-        new User({
+    async resolve(parent, args, {req, res}){
+        const existingEmail = await User.findOne({email: args.email});
+        if(existingEmail){
+            throw new Error('User exist already.')
+        }
+        const hashedPassword = await bcrypt.hash(args.password, 10);
+        const user = new User({
             name: args.name,
             address: args.address,
             email: args.email,
             mobile: args.mobile,
-            password: args.password,
-        }).save()
-        // user.save()
+            password: hashedPassword,
+        });
+        await user.save();
         return res.status(200).json({message: 'Sucessfull register!'})
     }
 }
 
-const signIn = {
-    type: GraphQLString,
-    description: 'Sign in on the app',
-    args:{
-        email: {type: GraphQLString},
-        password: {type: GraphQLString},
-    },
-    async resolve(parent, args){
-        const user = await User.findOne({email: args.email}).select('+password')
-        if(!user || args.password !== user.password){
-            throw new Error("Invalid Credentials")
-        }
-        const token = createJwtToken(user)
-        return token
-    }
-}
-
-module.exports = {addProduct, addUser, signIn}
+module.exports = {addProduct, addUser}

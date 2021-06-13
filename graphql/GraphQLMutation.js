@@ -14,6 +14,8 @@ export const ADD_USER_MUTATION = gql`
             email: $email, 
             mobile: $mobile,
             password: $password
-        )
+        ){
+            id
+        }
     }
 `;

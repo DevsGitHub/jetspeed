@@ -12,7 +12,7 @@ import { useMutation } from '@apollo/client'
 
 const SignUp = ({navigation}) => {
     const [secureTextEntry, setSecureTextEntry] = useState(true)
-    const [addUser, {error}] = useMutation(ADD_USER_MUTATION)
+    const [addUser] = useMutation(ADD_USER_MUTATION)
     // const [info, setInfo] = useState({name : '', address: '', email: '', mobile: '', password: ''})
     const [submitLoad, setSubmitLoad] = useState(false)
 
@@ -66,16 +66,13 @@ const SignUp = ({navigation}) => {
                             try {
                                 setSubmitLoad(true);
                                 const response = await addUser({
-                                    variables: {
-                                        data
-                                    }
+                                    variables: data
                                 })
-                                if(error){
-                                    console.log('unsa ni', error)
-                                }
                                 console.log('response', response)
+                                setSubmitLoad(false);
                             } catch (error) {
-                                console.log('err', error)
+                                console.log('err', error);
+                                setSubmitLoad(false);
                             }
                         }}
                         // onSubmit={handleSubmit}

@@ -1,19 +1,20 @@
+require('dotenv').config()
 const express = require('express')
 const { graphqlHTTP } = require('express-graphql')
 const app = express()
 const mongoose = require('mongoose');
 const schema = require('./graphql/schema')
+const cors = require('cors')
 // const {createJwtToken} = require('./jwt/auth')
-// const {authenticate} = require('./middleware/tokenchecker')
-
-require('dotenv').config()
+const {authenticate} = require('./jwt/tokenchecker')
 
 mongoose.connect(process.env.DATABASE_URI, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
 mongoose.connection.on('error', () => console.error(error))
 mongoose.connection.once('open', () => console.log('Connected to Database'))
 
 app.use(express.json())
-// app.use(authenticate)
+app.use(cors())
+app.use(authenticate)
 
 // const sellersRoute = require('./routes/sellers')
 // app.use('/sellers', sellersRoute)
