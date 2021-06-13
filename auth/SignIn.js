@@ -7,8 +7,14 @@ import * as yup from 'yup'
 import { Formik } from 'formik'
 import { styles } from '../styles/signInStyles';
 
+import {LOGIN_USER} from '../graphql/GraphQLMutation'
+import { useMutation } from '@apollo/client'
+
 const SignIn = ({navigation}) => {
     const [secureTextEntry, setSecureTextEntry] = useState(true)
+    const [signIn] = useMutation(LOGIN_USER)
+    const [submitLoad, setSubmitLoad] = useState(false)
+
     const loginValidationSchema = yup.object().shape({
         email: yup.string().email("Please enter valid email").required('Email Address is required'),
         password: yup.string().min(8, ({ min }) => `Password must be at least ${min} characters`).required('Password is required'),
@@ -30,7 +36,20 @@ const SignIn = ({navigation}) => {
                     <Formik
                         validationSchema={loginValidationSchema}
                         initialValues={{ email: '', password: '' }}
-                        onSubmit={values => console.log(values)}
+                        onSubmit={
+                            async (data, {setErrors}) => {
+                                try {
+                                    setSubmitLoad(true);
+                                    const response = await signIn({
+                                        variables: data
+                                    })
+                                    console.log('response', response)
+                                    setSubmitLoad(false);
+                                } catch (error) {
+                                    console.log('err', error);
+                                    setSubmitLoad(false);
+                                }
+                            }}
                     >
                         {({ 
                             handleChange, 
@@ -90,7 +109,7 @@ const SignIn = ({navigation}) => {
                             </TouchableOpacity>
 
                             <View style={styles.signInContainer}>
-                                <TouchableOpacity onPress={handleSubmit} disabled={!isValid}>
+                                <TouchableOpacity onPress={handleSubmit} disabled={!isValid || submitLoad}>
                                     <Text style={styles.signInButton}> SIGN IN </Text>
                                 </TouchableOpacity>
                             </View>

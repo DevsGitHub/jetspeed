@@ -3,6 +3,7 @@ const {UserType, ProductType} = require('./type')
 const User = require('../model/user')
 const Product = require('../model/product')
 const bcrypt = require("bcrypt")
+const jwt = require('jsonwebtoken')
 
 const addProduct = {
     type: ProductType,
@@ -48,8 +49,30 @@ const addUser = {
             password: hashedPassword,
         });
         await user.save();
-        return res.status(200).json({message: 'Sucessfull register!'})
+        return res.json({message: 'Sucessfull register!'})
     }
 }
 
-module.exports = {addProduct, addUser}
+const signIn = {
+    type: GraphQLString,
+    description: 'Sign in on the app',
+    args:{
+        email: {type: GraphQLString},
+        password: {type: GraphQLString},
+    },
+    async resolve(parent, args){
+        const user = await User.findOne({email: args.email}).select('+password');
+        if(!user){
+            throw new Error("Invalid Credentials")
+        }
+        const isEqual = await bcrypt.compare(args.password, user.password);
+        if(!isEqual){
+            throw new Error("Invalid Credentials")
+        }
+        return jwt.sign({userPass: user.password}, `${process.env.JWT_SECRET}`, {
+            expiresIn: '1d'
+        });
+    }
+}
+
+module.exports = {addProduct, addUser, signIn}

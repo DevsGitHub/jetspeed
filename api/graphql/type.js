@@ -42,13 +42,4 @@ const UserType = new GraphQLObjectType({
     })
 })
 
-const LoginType = new GraphQLObjectType({
-    name: 'Login',
-    description: 'Login to the app',
-    fields: () => ({
-        email: { type: GraphQLNonNull(GraphQLString) },
-        password: { type: GraphQLNonNull(GraphQLString) },
-    })
-})
-
-module.exports = {ProductType, UserType, LoginType }
+module.exports = {ProductType, UserType }
